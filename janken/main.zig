@@ -6,7 +6,17 @@ const HAND_TYPE = enum {
     paper,
 };
 
+const maxCPUCount = 100;
+
 pub fn main() !void {
+    std.debug.print("Choose cpu counts (up to 100). ====>\n", .{});
+    const cpuCount = try chooseNumber();
+    if (cpuCount > maxCPUCount) {
+        std.debug.print("Invalid Selection. Please select a number between 1 and 100.\n", .{});
+        return;
+    }
+    std.debug.print("CPU Count: {d}\n", .{cpuCount});
+
     std.debug.print("{s}\n", .{"Your Turn. Select Hands."});
     std.debug.print("{s}\n", .{"1 => Rock. 🪨"});
     std.debug.print("{s}\n", .{"2 => Scrissors. 🦞"});
@@ -14,16 +24,9 @@ pub fn main() !void {
 
     const handCount = @intFromEnum(HAND_TYPE.paper) + 1;
 
-    const buffer_size: usize = 10;
-    var buffer: [buffer_size]u8 = undefined;
-    const stdin = std.io.getStdIn().reader();
-
     // waiting for user input
     std.debug.print("----> \n", .{});
-    _ = try stdin.readUntilDelimiter(&buffer, '\n');
-
-    const char = buffer[0..1];
-    const res = try std.fmt.parseInt(u8, char, 10);
+    const res = try chooseNumber();
     const hand = res - 1;
     if (hand < 0 or hand >= handCount) {
         std.debug.print("Invalid Selection. Please select Rock(1), Paper(2) or Scissors(3).\n", .{});
@@ -40,6 +43,24 @@ pub fn main() !void {
             std.debug.print("{s}", .{message});
         }
     }
+}
+
+fn chooseNumber() !u8 {
+    const buffer_size: usize = 10;
+    var buffer: [buffer_size]u8 = undefined;
+    const stdin = std.io.getStdIn().reader();
+    _ = try stdin.readUntilDelimiter(&buffer, '\n');
+    var len: u8 = 0;
+    for (buffer) |c| {
+        if (c < '0' or c > '9') {
+            break;
+        } else {
+            len = len + 1;
+        }
+    }
+
+    const char = buffer[0..len];
+    return std.fmt.parseInt(u8, char, 10);
 }
 
 fn printHand(doer: []const u8, value: u8) void {

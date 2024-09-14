@@ -1,6 +1,10 @@
 const std = @import("std");
 
-const HAND_TYPE = enum { rock, scissors, paper };
+const HAND_TYPE = enum {
+    rock,
+    scissors,
+    paper,
+};
 
 pub fn main() !void {
     std.debug.print("{s}\n", .{"Your Turn. Select Hands."});
@@ -21,29 +25,29 @@ pub fn main() !void {
     const char = buffer[0..1];
     const res = try std.fmt.parseInt(u8, char, 10);
     const hand = res - 1;
-    switch (hand) {
-        @intFromEnum(HAND_TYPE.rock) => std.debug.print("You selected: Rock. 🪨\n", .{}),
-        @intFromEnum(HAND_TYPE.paper) => std.debug.print("You selected: Paper. 📄\n", .{}),
-        @intFromEnum(HAND_TYPE.scissors) => std.debug.print("You selected: Scissors. 🦞\n", .{}),
-        else => {
-            std.debug.print("Invalid Selection. Please select Rock(1), Paper(2) or Scissors(3).\n", .{});
-            return;
-        },
+    if (hand < 0 or hand >= handCount) {
+        std.debug.print("Invalid Selection. Please select Rock(1), Paper(2) or Scissors(3).\n", .{});
+        return;
     }
+    printHand("You", hand);
 
-    const cpu = try randomInt(0, handCount);
-    switch (cpu) {
-        @intFromEnum(HAND_TYPE.rock) => std.debug.print("CPU selected: Rock. 🪨\n", .{}),
-        @intFromEnum(HAND_TYPE.paper) => std.debug.print("CPU selected: Paper. 📄\n", .{}),
-        @intFromEnum(HAND_TYPE.scissors) => std.debug.print("CPU selected: Scissors. 🦞\n", .{}),
-        else => unreachable,
-    }
+    const cpu = try randomInt(0, handCount - 1);
+    printHand("CPU", cpu);
 
     const messages: [3][]const u8 = .{ "Draw. 🤝\n", "You Win. 🎉\n", "You Lose. 😢\n" };
     for (messages, 0..) |message, index| {
         if ((hand + index) % handCount == cpu) {
             std.debug.print("{s}", .{message});
         }
+    }
+}
+
+fn printHand(doer: []const u8, value: u8) void {
+    switch (value) {
+        @intFromEnum(HAND_TYPE.rock) => std.debug.print("{s} selected: Rock. 🪨\n", .{doer}),
+        @intFromEnum(HAND_TYPE.paper) => std.debug.print("{s} selected: Paper. 📄\n", .{doer}),
+        @intFromEnum(HAND_TYPE.scissors) => std.debug.print("{s} selected: Scissors. 🦞\n", .{doer}),
+        else => unreachable,
     }
 }
 

@@ -31,15 +31,7 @@ pub fn main() !void {
         },
     }
 
-    var prng = std.rand.DefaultPrng.init(blk: {
-        var seed: u64 = undefined;
-        try std.posix.getrandom(std.mem.asBytes(&seed));
-        break :blk seed;
-    });
-    const rand = prng.random();
-    const i = rand.int(u8);
-
-    const cpu = i % handCount;
+    const cpu = try randomInt(0, handCount);
     switch (cpu) {
         @intFromEnum(HAND_TYPE.rock) => std.debug.print("CPU selected: Rock. 🪨\n", .{}),
         @intFromEnum(HAND_TYPE.paper) => std.debug.print("CPU selected: Paper. 📄\n", .{}),
@@ -53,4 +45,14 @@ pub fn main() !void {
             std.debug.print("{s}", .{message});
         }
     }
+}
+
+fn randomInt(min: u8, max: u8) !u8 {
+    var prng = std.rand.DefaultPrng.init(blk: {
+        var seed: u64 = undefined;
+        try std.posix.getrandom(std.mem.asBytes(&seed));
+        break :blk seed;
+    });
+    const rand = prng.random();
+    return (min + rand.int(u8)) % max;
 }

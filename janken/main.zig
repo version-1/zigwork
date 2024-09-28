@@ -110,7 +110,7 @@ pub fn main() !void {
     defer arena.deinit();
 
     for (1..(cpuCount + 1)) |index| {
-        var buf: [5]u8 = undefined;
+        var buf: [10]u8 = undefined;
         const name = try std.fmt.bufPrint(&buf, "CPU {d}", .{index});
         const handInt = try randomInt(0, handCount - 1);
         const cpu = Player{
